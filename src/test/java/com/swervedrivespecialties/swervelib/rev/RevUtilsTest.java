@@ -1,10 +1,10 @@
 package com.swervedrivespecialties.swervelib.rev;
 
-import com.revrobotics.REVLibError;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import com.revrobotics.REVLibError;
+import org.junit.jupiter.api.Test;
 
 class RevUtilsTest {
     @Test

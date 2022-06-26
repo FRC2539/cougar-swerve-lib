@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'com.diffplug.spotless' version '6.6.1'
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -45,6 +46,16 @@ publishing {
     }
 }
 
-test {
-    useJUnitPlatform()
+spotless {
+   java {
+      target fileTree('.') {
+            include '**/*.java'
+            exclude '**/build/**', '**/build-*/**'
+      }
+      toggleOffOn()
+      palantirJavaFormat()
+      removeUnusedImports()
+      trimTrailingWhitespace()
+      endWithNewline()
+   }
 }

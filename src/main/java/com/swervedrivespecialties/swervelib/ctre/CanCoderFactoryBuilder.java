@@ -1,13 +1,12 @@
 package com.swervedrivespecialties.swervelib.ctre;
 
-import java.util.Optional;
-
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoderFactory;
+import java.util.Optional;
 
 public class CanCoderFactoryBuilder {
     private Direction direction = Direction.COUNTER_CLOCKWISE;
@@ -38,10 +37,9 @@ public class CanCoderFactoryBuilder {
             config.initializationStrategy = configuration.getInitStrategy();
 
             CANCoder encoder;
-            
+
             // Create a CANCoder instance that optionally uses a CANivore
-            if (canivoreName.isPresent())
-                encoder = new CANCoder(configuration.getId(), canivoreName.get());
+            if (canivoreName.isPresent()) encoder = new CANCoder(configuration.getId(), canivoreName.get());
             else encoder = new CANCoder(configuration.getId());
 
             CtreUtils.checkCtreError(encoder.configAllSettings(config, 250), "Failed to configure CANCoder");

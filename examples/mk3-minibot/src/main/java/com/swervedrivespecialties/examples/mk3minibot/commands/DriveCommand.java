@@ -3,7 +3,6 @@ package com.swervedrivespecialties.examples.mk3minibot.commands;
 import com.swervedrivespecialties.examples.mk3minibot.subsystems.DrivetrainSubsystem;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
 import java.util.function.DoubleSupplier;
 
 public class DriveCommand extends CommandBase {
@@ -16,8 +15,7 @@ public class DriveCommand extends CommandBase {
             DrivetrainSubsystem drivetrain,
             DoubleSupplier translationXSupplier,
             DoubleSupplier translationYSupplier,
-            DoubleSupplier rotationSupplier
-    ) {
+            DoubleSupplier rotationSupplier) {
         this.drivetrain = drivetrain;
         this.translationXSupplier = translationXSupplier;
         this.translationYSupplier = translationYSupplier;
@@ -32,14 +30,11 @@ public class DriveCommand extends CommandBase {
         double translationYPercent = translationYSupplier.getAsDouble();
         double rotationPercent = rotationSupplier.getAsDouble();
 
-        drivetrain.drive(
-                ChassisSpeeds.fromFieldRelativeSpeeds(
-                        translationXPercent * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
-                        translationYPercent * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
-                        rotationPercent * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
-                        drivetrain.getRotation()
-                )
-        );
+        drivetrain.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
+                translationXPercent * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
+                translationYPercent * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
+                rotationPercent * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
+                drivetrain.getRotation()));
     }
 
     @Override
