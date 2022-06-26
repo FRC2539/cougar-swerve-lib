@@ -28,3 +28,44 @@ In `settings.gradle` add the following to the end of the file:
 include ':cougar-swerve-lib'
 project(':cougar-swerve-lib').projectDir = new File('../cougar-swerve-lib')
 ```
+
+### Preventing Formatting Errors
+
+If your project uses spotless or another formatter that runs checks during a build, you'll need to ignore the submodule folder.
+
+For spotless, change your configuration from something like this:
+
+```
+spotless {
+   java {
+      target fileTree('.') {
+            include '**/*.java'
+            exclude '**/build/**', '**/build-*/**'
+      }
+      toggleOffOn()
+      palantirJavaFormat()
+      removeUnusedImports()
+      trimTrailingWhitespace()
+      endWithNewline()
+   }
+}
+```
+
+to something like this (exclusion added):
+
+```
+spotless {
+   java {
+      target fileTree('.') {
+            include '**/*.java'
+            exclude '**/build/**', '**/build-*/**'
+            exclude 'cougar-swerve-lib'
+      }
+      toggleOffOn()
+      palantirJavaFormat()
+      removeUnusedImports()
+      trimTrailingWhitespace()
+      endWithNewline()
+   }
+}
+```
