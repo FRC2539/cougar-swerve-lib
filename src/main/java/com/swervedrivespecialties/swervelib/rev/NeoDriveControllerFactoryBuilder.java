@@ -1,13 +1,14 @@
 package com.swervedrivespecialties.swervelib.rev;
 
+import static com.swervedrivespecialties.swervelib.rev.RevUtils.checkNeoError;
+
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.swervedrivespecialties.swervelib.DriveController;
 import com.swervedrivespecialties.swervelib.DriveControllerFactory;
 import com.swervedrivespecialties.swervelib.ModuleConfiguration;
-
-import static com.swervedrivespecialties.swervelib.rev.RevUtils.checkNeoError;
 
 public final class NeoDriveControllerFactoryBuilder {
     private double nominalVoltage = Double.NaN;
@@ -50,15 +51,22 @@ public final class NeoDriveControllerFactoryBuilder {
                 checkNeoError(motor.setSmartCurrentLimit((int) currentLimit), "Failed to set current limit for NEO");
             }
 
-            checkNeoError(motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100), "Failed to set periodic status frame 0 rate");
-            checkNeoError(motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20), "Failed to set periodic status frame 1 rate");
-            checkNeoError(motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 20), "Failed to set periodic status frame 2 rate");
+            checkNeoError(
+                    motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100),
+                    "Failed to set periodic status frame 0 rate");
+            checkNeoError(
+                    motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20),
+                    "Failed to set periodic status frame 1 rate");
+            checkNeoError(
+                    motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 20),
+                    "Failed to set periodic status frame 2 rate");
             // Set neutral mode to brake
             motor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
             // Setup encoder
             RelativeEncoder encoder = motor.getEncoder();
-            double positionConversionFactor = Math.PI * moduleConfiguration.getWheelDiameter() * moduleConfiguration.getDriveReduction();
+            double positionConversionFactor =
+                    Math.PI * moduleConfiguration.getWheelDiameter() * moduleConfiguration.getDriveReduction();
             encoder.setPositionConversionFactor(positionConversionFactor);
             encoder.setVelocityConversionFactor(positionConversionFactor / 60.0);
 
@@ -76,6 +84,16 @@ public final class NeoDriveControllerFactoryBuilder {
         }
 
         @Override
+        public Double getMotorTemperature() {
+            return motor.getMotorTemperature();
+        }
+
+        @Override
+        public Double getDriveMotor() {
+            return 0.0;
+        }
+
+        @Override
         public void setReferenceVoltage(double voltage) {
             motor.setVoltage(voltage);
         }
@@ -84,5 +102,13 @@ public final class NeoDriveControllerFactoryBuilder {
         public double getStateVelocity() {
             return encoder.getVelocity();
         }
+
+        @Override
+        public WPI_TalonFX getRawDriveMotor() {
+            return null;
+        }
+
+        @Override
+        public void resetEncoder() {}
     }
 }

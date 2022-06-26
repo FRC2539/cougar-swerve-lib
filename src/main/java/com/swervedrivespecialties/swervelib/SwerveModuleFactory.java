@@ -1,6 +1,6 @@
 package com.swervedrivespecialties.swervelib;
 
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 
 public class SwerveModuleFactory<DriveConfiguration, SteerConfiguration> {
@@ -8,9 +8,10 @@ public class SwerveModuleFactory<DriveConfiguration, SteerConfiguration> {
     private final DriveControllerFactory<?, DriveConfiguration> driveControllerFactory;
     private final SteerControllerFactory<?, SteerConfiguration> steerControllerFactory;
 
-    public SwerveModuleFactory(ModuleConfiguration moduleConfiguration,
-                               DriveControllerFactory<?, DriveConfiguration> driveControllerFactory,
-                               SteerControllerFactory<?, SteerConfiguration> steerControllerFactory) {
+    public SwerveModuleFactory(
+            ModuleConfiguration moduleConfiguration,
+            DriveControllerFactory<?, DriveConfiguration> driveControllerFactory,
+            SteerControllerFactory<?, SteerConfiguration> steerControllerFactory) {
         this.moduleConfiguration = moduleConfiguration;
         this.driveControllerFactory = driveControllerFactory;
         this.steerControllerFactory = steerControllerFactory;
@@ -23,17 +24,12 @@ public class SwerveModuleFactory<DriveConfiguration, SteerConfiguration> {
         return new ModuleImplementation(driveController, steerController);
     }
 
-    public SwerveModule create(ShuffleboardLayout container, DriveConfiguration driveConfiguration, SteerConfiguration steerConfiguration) {
-        var driveController = driveControllerFactory.create(
-                container,
-                driveConfiguration,
-                moduleConfiguration
-        );
-        var steerContainer = steerControllerFactory.create(
-                container,
-                steerConfiguration,
-                moduleConfiguration
-        );
+    public SwerveModule create(
+            ShuffleboardLayout container,
+            DriveConfiguration driveConfiguration,
+            SteerConfiguration steerConfiguration) {
+        var driveController = driveControllerFactory.create(container, driveConfiguration, moduleConfiguration);
+        var steerContainer = steerControllerFactory.create(container, steerConfiguration, moduleConfiguration);
 
         return new ModuleImplementation(driveController, steerContainer);
     }
@@ -47,6 +43,34 @@ public class SwerveModuleFactory<DriveConfiguration, SteerConfiguration> {
             this.steerController = steerController;
         }
 
+        public Double getDriveTemperature() {
+            return driveController.getMotorTemperature();
+        }
+
+        public Double getSteerTemperature() {
+            return steerController.getMotorTemperature();
+        }
+
+        @Override
+        public Double getDriveMotor() {
+            return driveController.getDriveMotor();
+        }
+
+        @Override
+        public void resetEncoder() {
+            driveController.resetEncoder();
+        }
+
+        @Override
+        public Object getSteerMotor() {
+            return steerController.getSteerMotor();
+        }
+
+        @Override
+        public AbsoluteEncoder getSteerEncoder() {
+            return steerController.getSteerEncoder();
+        }
+
         @Override
         public double getDriveVelocity() {
             return driveController.getStateVelocity();
@@ -55,6 +79,16 @@ public class SwerveModuleFactory<DriveConfiguration, SteerConfiguration> {
         @Override
         public double getSteerAngle() {
             return steerController.getStateAngle();
+        }
+
+        @Override
+        public WPI_TalonFX getRawDriveMotor() {
+            return driveController.getRawDriveMotor();
+        }
+
+        @Override
+        public WPI_TalonFX getRawSteerMotor() {
+            return steerController.getRawSteerMotor();
         }
 
         @Override

@@ -1,6 +1,7 @@
 package com.swervedrivespecialties.swervelib;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Additional Mk4 module configuration parameters.
@@ -12,6 +13,8 @@ public class Mk4ModuleConfiguration {
     private double nominalVoltage = 12.0;
     private double driveCurrentLimit = 80.0;
     private double steerCurrentLimit = 20.0;
+    private boolean driveInverted = false;
+    private Optional<String> canivoreName = Optional.empty();
 
     public double getNominalVoltage() {
         return nominalVoltage;
@@ -37,12 +40,30 @@ public class Mk4ModuleConfiguration {
         this.steerCurrentLimit = steerCurrentLimit;
     }
 
+    public void setCanivoreName(String canivoreName) {
+        this.canivoreName = Optional.of(canivoreName);
+    }
+
+    public Optional<String> getCanivoreName() {
+        return canivoreName;
+    }
+
+    public void setDriveInverted(boolean driveInverted) {
+        this.driveInverted = driveInverted;
+    }
+
+    public boolean getDriveInverted() {
+        return driveInverted;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Mk4ModuleConfiguration that = (Mk4ModuleConfiguration) o;
-        return Double.compare(that.getNominalVoltage(), getNominalVoltage()) == 0 && Double.compare(that.getDriveCurrentLimit(), getDriveCurrentLimit()) == 0 && Double.compare(that.getSteerCurrentLimit(), getSteerCurrentLimit()) == 0;
+        return Double.compare(that.getNominalVoltage(), getNominalVoltage()) == 0
+                && Double.compare(that.getDriveCurrentLimit(), getDriveCurrentLimit()) == 0
+                && Double.compare(that.getSteerCurrentLimit(), getSteerCurrentLimit()) == 0;
     }
 
     @Override
@@ -52,10 +73,9 @@ public class Mk4ModuleConfiguration {
 
     @Override
     public String toString() {
-        return "Mk4ModuleConfiguration{" +
-                "nominalVoltage=" + nominalVoltage +
-                ", driveCurrentLimit=" + driveCurrentLimit +
-                ", steerCurrentLimit=" + steerCurrentLimit +
-                '}';
+        return "Mk4ModuleConfiguration{" + "nominalVoltage="
+                + nominalVoltage + ", driveCurrentLimit="
+                + driveCurrentLimit + ", steerCurrentLimit="
+                + steerCurrentLimit + '}';
     }
 }

@@ -1,10 +1,11 @@
 package com.swervedrivespecialties.swervelib.rev;
 
+import static com.swervedrivespecialties.swervelib.rev.RevUtils.checkNeoError;
+
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.*;
 import com.swervedrivespecialties.swervelib.*;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
-
-import static com.swervedrivespecialties.swervelib.rev.RevUtils.checkNeoError;
 
 public final class NeoSteerControllerFactoryBuilder {
     // PID configuration
@@ -44,11 +45,13 @@ public final class NeoSteerControllerFactoryBuilder {
         return Double.isFinite(currentLimit);
     }
 
-    public <T> SteerControllerFactory<ControllerImplementation, NeoSteerConfiguration<T>> build(AbsoluteEncoderFactory<T> encoderFactory) {
+    public <T> SteerControllerFactory<ControllerImplementation, NeoSteerConfiguration<T>> build(
+            AbsoluteEncoderFactory<T> encoderFactory) {
         return new FactoryImplementation<>(encoderFactory);
     }
 
-    public class FactoryImplementation<T> implements SteerControllerFactory<ControllerImplementation, NeoSteerConfiguration<T>> {
+    public class FactoryImplementation<T>
+            implements SteerControllerFactory<ControllerImplementation, NeoSteerConfiguration<T>> {
         private final AbsoluteEncoderFactory<T> encoderFactory;
 
         public FactoryImplementation(AbsoluteEncoderFactory<T> encoderFactory) {
@@ -58,30 +61,48 @@ public final class NeoSteerControllerFactoryBuilder {
         @Override
         public void addDashboardEntries(ShuffleboardContainer container, ControllerImplementation controller) {
             SteerControllerFactory.super.addDashboardEntries(container, controller);
-            container.addNumber("Absolute Encoder Angle", () -> Math.toDegrees(controller.absoluteEncoder.getAbsoluteAngle()));
+            container.addNumber(
+                    "Absolute Encoder Angle", () -> Math.toDegrees(controller.absoluteEncoder.getAbsoluteAngle()));
         }
 
         @Override
-        public ControllerImplementation create(NeoSteerConfiguration<T> steerConfiguration, ModuleConfiguration moduleConfiguration) {
+        public ControllerImplementation create(
+                NeoSteerConfiguration<T> steerConfiguration, ModuleConfiguration moduleConfiguration) {
             AbsoluteEncoder absoluteEncoder = encoderFactory.create(steerConfiguration.getEncoderConfiguration());
 
-            CANSparkMax motor = new CANSparkMax(steerConfiguration.getMotorPort(), CANSparkMaxLowLevel.MotorType.kBrushless);
-            checkNeoError(motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100), "Failed to set periodic status frame 0 rate");
-            checkNeoError(motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20), "Failed to set periodic status frame 1 rate");
-            checkNeoError(motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 20), "Failed to set periodic status frame 2 rate");
+            CANSparkMax motor =
+                    new CANSparkMax(steerConfiguration.getMotorPort(), CANSparkMaxLowLevel.MotorType.kBrushless);
+            checkNeoError(
+                    motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100),
+                    "Failed to set periodic status frame 0 rate");
+            checkNeoError(
+                    motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20),
+                    "Failed to set periodic status frame 1 rate");
+            checkNeoError(
+                    motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 20),
+                    "Failed to set periodic status frame 2 rate");
             checkNeoError(motor.setIdleMode(CANSparkMax.IdleMode.kBrake), "Failed to set NEO idle mode");
             motor.setInverted(!moduleConfiguration.isSteerInverted());
             if (hasVoltageCompensation()) {
                 checkNeoError(motor.enableVoltageCompensation(nominalVoltage), "Failed to enable voltage compensation");
             }
             if (hasCurrentLimit()) {
-                checkNeoError(motor.setSmartCurrentLimit((int) Math.round(currentLimit)), "Failed to set NEO current limits");
+                checkNeoError(
+                        motor.setSmartCurrentLimit((int) Math.round(currentLimit)), "Failed to set NEO current limits");
             }
 
             RelativeEncoder integratedEncoder = motor.getEncoder();
-            checkNeoError(integratedEncoder.setPositionConversionFactor(2.0 * Math.PI * moduleConfiguration.getSteerReduction()), "Failed to set NEO encoder conversion factor");
-            checkNeoError(integratedEncoder.setVelocityConversionFactor(2.0 * Math.PI * moduleConfiguration.getSteerReduction() / 60.0), "Failed to set NEO encoder conversion factor");
-            checkNeoError(integratedEncoder.setPosition(absoluteEncoder.getAbsoluteAngle()), "Failed to set NEO encoder position");
+            checkNeoError(
+                    integratedEncoder.setPositionConversionFactor(
+                            2.0 * Math.PI * moduleConfiguration.getSteerReduction()),
+                    "Failed to set NEO encoder conversion factor");
+            checkNeoError(
+                    integratedEncoder.setVelocityConversionFactor(
+                            2.0 * Math.PI * moduleConfiguration.getSteerReduction() / 60.0),
+                    "Failed to set NEO encoder conversion factor");
+            checkNeoError(
+                    integratedEncoder.setPosition(absoluteEncoder.getAbsoluteAngle()),
+                    "Failed to set NEO encoder position");
 
             SparkMaxPIDController controller = motor.getPIDController();
             if (hasPidConstants()) {
@@ -101,6 +122,7 @@ public final class NeoSteerControllerFactoryBuilder {
 
         @SuppressWarnings({"FieldCanBeLocal", "unused"})
         private final CANSparkMax motor;
+
         private final SparkMaxPIDController controller;
         private final RelativeEncoder motorEncoder;
         private final AbsoluteEncoder absoluteEncoder;
@@ -114,6 +136,21 @@ public final class NeoSteerControllerFactoryBuilder {
             this.controller = motor.getPIDController();
             this.motorEncoder = motor.getEncoder();
             this.absoluteEncoder = absoluteEncoder;
+        }
+
+        @Override
+        public Double getMotorTemperature() {
+            return motor.getMotorTemperature();
+        }
+
+        @Override
+        public Object getSteerMotor() {
+            return this.motor;
+        }
+
+        @Override
+        public AbsoluteEncoder getSteerEncoder() {
+            return this.absoluteEncoder;
         }
 
         @Override
@@ -166,6 +203,11 @@ public final class NeoSteerControllerFactoryBuilder {
             }
 
             return motorAngleRadians;
+        }
+
+        @Override
+        public WPI_TalonFX getRawSteerMotor() {
+            return null;
         }
     }
 }
