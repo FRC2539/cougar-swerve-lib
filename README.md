@@ -26,7 +26,7 @@ In `settings.gradle` add the following to the end of the file:
 
 ```
 include ':cougar-swerve-lib'
-project(':cougar-swerve-lib').projectDir = new File('../cougar-swerve-lib')
+project(':cougar-swerve-lib').projectDir = new File('./cougar-swerve-lib')
 ```
 
 ### Preventing Formatting Errors
