@@ -21,7 +21,7 @@ This allows the project to fetch modules from the Maven Central Repository.
 Next, add the following to the end of the `dependencies` list:
 
 ```
-implementation 'com.team2539:cougarswervelib:1.1.0'
+implementation 'com.team2539:cougar-swerve-lib:1.1.0'
 ```
 
 **Replace 1.1.0 with the most recent version available.**
