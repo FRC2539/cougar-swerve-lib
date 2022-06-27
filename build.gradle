@@ -1,13 +1,15 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'signing'
+    id 'com.diffplug.spotless' version '6.6.1'
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
 allprojects {
-    group 'com.swervedrivespecialties'
+    group 'com.team2539'
     version '1.1.0'
 
     repositories {
@@ -37,10 +39,70 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
+
+            pom {
+                name = 'cougarswervelib'
+                description = 'A custom fork of the the SDS Swerve Library with support for important features, such as CANivore support and direct access to motors.'
+                url = 'https://github.com/FRC2539/cougar-swerve-lib'
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://github.com/FRC2539/cougar-swerve-lib/blob/develop/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'we-gold'
+                        name = 'Weaver Goldman'
+                        email = 'we.goldm@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/FRC2539/cougar-swerve-lib.git'
+                    developerConnection = 'scm:git:ssh://github.com/FRC2539/cougar-swerve-lib.git'
+                    url = 'https://github.com/FRC2539/cougar-swerve-lib'
+                }
+            }
         }
     }
+    
+    repositories {
+        maven {
+            url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username System.getenv("MAVEN_USERNAME")
+                password System.getenv("MAVEN_PASSWORD")
+            }
+        }
+    }
+}
+
+signing {
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications.mavenJava
+}
+
+spotless {
+   java {
+      target fileTree('.') {
+            include '**/*.java'
+            exclude '**/build/**', '**/build-*/**'
+      }
+      toggleOffOn()
+      palantirJavaFormat()
+      removeUnusedImports()
+      trimTrailingWhitespace()
+      endWithNewline()
+   }
 }

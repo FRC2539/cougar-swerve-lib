@@ -6,8 +6,3 @@ pluginManagement {
 }
 
 rootProject.name = 'cougar-swerve-lib'
-
-include(
-        ':examples:mk3-minibot',
-        ':examples:mk3-testchassis'
-)
