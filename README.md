@@ -5,6 +5,7 @@ This is a fork of the original SDS Swerve Library. It implements features that w
 - CANivore support
 - Direct access to motor controllers
 - Optional drive motor direction inversion
+- Access to motor temperatures
 
 # Usage
 
