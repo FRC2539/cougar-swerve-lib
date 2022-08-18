@@ -43,9 +43,17 @@ For example, if you have the javabot repository in the `code` folder on your com
 
 ## Workflow
 
-Given the changes to imports in robot projects, it is necessary to follow the steps below when testing this library. 
+Given the plugin conflicts and the changes to imports in robot projects, it is necessary to follow the steps below when testing this library. 
 
 When you are ready to publish a new version, make sure to undo these changes.
+
+## Resolving Plugin Conflicts
+
+Certain plugins, like the spotless formatter, will create conflicts. 
+
+We use spotless in our robot code, which will cause a conflict, because only the parent project (robot project becomes parent during this whole process) should declare a plugin version.
+
+All you need to do is comment out the plugin import for spotless, and the section labeled `spotless`. 
 
 ## Importing into a Robot Project
 
@@ -69,3 +77,5 @@ _You may need to run the `Reload Window` command in the robot project for the la
 ## Undoing These Changes
 
 Make sure to undo all the commenting out and import changes that we just made before you commit or publish the robot code or this library. 
+
+Also, make sure to run the spotless formatter on this library before publishing the new version.
